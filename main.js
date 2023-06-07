@@ -15,21 +15,23 @@ module.exports.loop = function () {
     var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
     var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
 
-    if (harvesters.length < 2) {
-        var newName = 'Harvester' + Game.time;
-        console.log('Spawning new harvester: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'harvester'}});
-    } else if(upgraders.length < 1) {
-        var newName = 'Upgrader' + Game.time;
-        console.log('Spawning new upgrader: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'upgrader'}});
-    } else if (builders.length < 3) {
-        var newName = 'Builder' + Game.time;
-        console.log('Spawning new builder: ' + newName);
-        Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
-            {memory: {role: 'builder'}});
+    if (Game.spawns['Spawn1'].store.getUsedCapacity([RESOURCE_ENERGY]) >= bodyCost([WORK,CARRY,MOVE])) {
+        if (harvesters.length < 2) {
+            var newName = 'Harvester' + Game.time;
+            console.log('Spawning new harvester: ' + newName);
+            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                {memory: {role: 'harvester'}});
+        } else if(upgraders.length < 1) {
+            var newName = 'Upgrader' + Game.time;
+            console.log('Spawning new upgrader: ' + newName);
+            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                {memory: {role: 'upgrader'}});
+        } else if (builders.length < 4) {
+            var newName = 'Builder' + Game.time;
+            console.log('Spawning new builder: ' + newName);
+            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+                {memory: {role: 'builder'}});
+        }
     }
     
     if(Game.spawns['Spawn1'].spawning) { 
@@ -53,4 +55,12 @@ module.exports.loop = function () {
             roleBuilder.run(creep);
         }
     }
+}
+
+function bodyCost(body)
+{
+    let sum = 0;
+    for (let i in body)
+        sum += BODYPART_COST[body[i]];
+    return sum;
 }
