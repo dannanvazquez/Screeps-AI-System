@@ -14,22 +14,32 @@ module.exports.loop = function () {
     var harvesters = _.filter(Game.creeps, (creep) => creep.memory.role == 'harvester');
     var upgraders = _.filter(Game.creeps, (creep) => creep.memory.role == 'upgrader');
     var builders = _.filter(Game.creeps, (creep) => creep.memory.role == 'builder');
-
-    if (Game.spawns['Spawn1'].store.getUsedCapacity([RESOURCE_ENERGY]) >= bodyCost([WORK,CARRY,MOVE])) {
+    
+    var bodyParts = [WORK,CARRY,MOVE];
+    if (Game.spawns['Spawn1'].canCreateCreep(bodyParts, 'Test') == OK) {
+        var tier = 1;
+        while (Game.rooms['E38N54'].energyAvailable > 200 + (tier * 100)) {
+            tier++;
+            bodyParts.push(WORK);
+        }
+        if (Game.rooms['E38N54'].energyAvailable >= 150 + (tier * 100)) {
+            tier+=0.5;
+            bodyParts.push(MOVE);
+        }
         if (harvesters.length < 2) {
-            var newName = 'Harvester' + Game.time;
+            var newName = '[T' + tier + ']Harvester' + Game.time;
             console.log('Spawning new harvester: ' + newName);
-            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+            Game.spawns['Spawn1'].spawnCreep(bodyParts, newName, 
                 {memory: {role: 'harvester'}});
         } else if(upgraders.length < 1) {
-            var newName = 'Upgrader' + Game.time;
+            var newName = '[T' + tier + ']Upgrader' + Game.time;
             console.log('Spawning new upgrader: ' + newName);
-            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+            Game.spawns['Spawn1'].spawnCreep(bodyParts, newName, 
                 {memory: {role: 'upgrader'}});
-        } else if (builders.length < 4) {
-            var newName = 'Builder' + Game.time;
+        } else if (builders.length < 6 && Game.spawns['Spawn1'].room.find(FIND_CONSTRUCTION_SITES).length > 0) {
+            var newName = '[T' + tier + ']Builder' + Game.time;
             console.log('Spawning new builder: ' + newName);
-            Game.spawns['Spawn1'].spawnCreep([WORK,CARRY,MOVE], newName, 
+            Game.spawns['Spawn1'].spawnCreep(bodyParts, newName, 
                 {memory: {role: 'builder'}});
         }
     }
@@ -55,12 +65,4 @@ module.exports.loop = function () {
             roleBuilder.run(creep);
         }
     }
-}
-
-function bodyCost(body)
-{
-    let sum = 0;
-    for (let i in body)
-        sum += BODYPART_COST[body[i]];
-    return sum;
 }
