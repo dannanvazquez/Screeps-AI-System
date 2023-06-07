@@ -23,7 +23,7 @@ var roleHarvester = {
                     creep.moveTo(targets[0], {visualizePathStyle: {stroke: '#ffffff'}});
                 }
             } else {
-                creep.moveTo(38, 20, {visualizePathStyle: {stroke: '#ffffff'}});
+                creep.moveTo(Game.flags["Idle"], {visualizePathStyle: {stroke: '#ffffff'}});
             }
         }
 	}
