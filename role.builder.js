@@ -28,7 +28,7 @@ var roleBuilder = {
                 } else {
                     var repairableStructures = creep.room.find(FIND_STRUCTURES, {filter: (s) => s.hits < s.hitsMax});
                     if (repairableStructures.length) { 
-                        var sortedRepairables = _.sortBy(repairableStructures, s => (s.hits * 40) * creep.pos.getRangeTo(s));
+                        var sortedRepairables = _.sortBy(repairableStructures, s => (s.hits * 100) * creep.pos.getRangeTo(s));
                         if(creep.repair(sortedRepairables[0]) == ERR_NOT_IN_RANGE) {
                             creep.moveTo(sortedRepairables[0], {visualizePathStyle: {stroke: '#ffffff'}});
                         }
